@@ -1,0 +1,34 @@
+{
+    "compilerOptions": {
+        "noEmitOnError": true,
+        "noImplicitAny": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "removeComments": false,
+        "sourceMap": true,
+        "incremental": true,
+        "lib": [
+            "es5",
+            "es2015.promise",
+            "es2015.iterable",
+            "dom"
+        ],
+        /*"types": [
+            "jquery",
+            "@types/qtip2",
+            "@types/stripe-v2",
+            "@types/jquery.validation",
+        ],*/
+        "module": "node16",
+        "moduleResolution": "node16",
+        "outDir": "js/",
+        "strict": true,
+        "target": "es2017",
+        // "target": "es3",
+        // "ignoreDeprecations": "5.0",
+    },
+    "exclude": [
+        "node_modules",
+        "wwwroot"
+    ]
+}
