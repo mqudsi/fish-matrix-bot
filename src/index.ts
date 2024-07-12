@@ -197,7 +197,7 @@ async function mapGitHubIssue(number: number): Promise<GitHubLink | undefined> {
                 return "🛠️";
             }
             if (issue.data.state_reason === "completed") {
-                return "☑️";
+                return "☑️️";
             }
             if (issue.data.state_reason === "not_planned") {
                 return "❌";
