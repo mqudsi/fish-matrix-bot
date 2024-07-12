@@ -1,7 +1,7 @@
 // NOTE: package.json must include `"type": "module",` for type hints to work correctly!
 
 import { Octokit } from "octokit";
-import { MatrixClient, SimpleFsStorageProvider, AutojoinRoomsMixin, MatrixAuth, RustSdkCryptoStorageProvider } from "matrix-bot-sdk";
+import { MatrixClient, SimpleFsStorageProvider, MatrixAuth, RustSdkCryptoStorageProvider } from "matrix-bot-sdk";
 
 const homeServerUrl = "https://matrix.org";
 const accessToken = process.env.ACCESS_TOKEN!;
@@ -32,8 +32,6 @@ async function main() {
     const storage = new SimpleFsStorageProvider("fish-bot.json");
     const crypto = new RustSdkCryptoStorageProvider("./crypto");
     const client = new MatrixClient(homeServerUrl, accessToken, storage, crypto);
-
-    AutojoinRoomsMixin.setupOnClient(client);
 
     client.on("room.message", async (roomId, event) => {
         await messageReceived(client, roomId, event);
