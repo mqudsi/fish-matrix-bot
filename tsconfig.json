@@ -21,7 +21,7 @@
         ],*/
         "module": "node16",
         "moduleResolution": "node16",
-        "outDir": "js/",
+        "outDir": "out/",
         "strict": true,
         "target": "es2017",
         // "target": "es3",

@@ -1,0 +1,5 @@
+crypto/
+fish-bot.json
+node_modules/
+out/
+run.sh
