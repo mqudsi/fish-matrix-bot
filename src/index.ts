@@ -56,7 +56,7 @@ async function messageReceived(client: MatrixClient, roomId: string, event: any)
 		return;
 	}
 
-	console.trace(`Message received from ${sender}: `, body);
+	console.debug(`Message received from ${sender}: `, body);
 	const issueNumbers = extractIssueNumbers(body);
 	if (!issueNumbers || issueNumbers.length == 0) {
 		return;
