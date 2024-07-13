@@ -40,6 +40,11 @@ async function main() {
     console.log("Matrix client started");
 }
 
+interface MatrixMessage {
+    sender: string,
+    body: string,
+}
+
 class MatrixBot {
     github: GitHub;
     client: MatrixClient;
@@ -53,25 +58,35 @@ class MatrixBot {
         });
     }
 
+    // Primary entry point to handle actions that take place when a new room
+    // message is received. Subsequently calls individual action handlers.
     async messageHandler(roomId: string, event: any) {
         if (!event["content"]) {
             return;
         }
 
-        const sender = event["sender"];
-        const body = event["content"]["body"];
+        const message: MatrixMessage = {
+            sender: event["sender"],
+            body: event["content"]["body"],
+        };
 
         // Make sure we don't recursively process our own replies!
-        if (sender === await this.client.getUserId()) {
+        if (message.sender === await this.client.getUserId()) {
             return;
         }
 
-        const issueNumbers = extractIssueNumbers(body);
+        await this.linkGitHubIssues(roomId, message);
+    }
+
+    // Detects issue or pull request references in message text and responds
+    // with a link to the matching issue.
+    async linkGitHubIssues(roomId: string, message: MatrixMessage) {
+        const issueNumbers = extractIssueNumbers(message.body);
         if (!issueNumbers || issueNumbers.length == 0) {
             return;
         }
 
-        console.debug(`Message received from ${sender}: `, body);
+        console.debug(`Message received from ${message.sender}: `, message.body);
         console.debug("Issue numbers found: ", issueNumbers);
 
         const githubLinks: GitHubLink[] = [];
