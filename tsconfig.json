@@ -27,8 +27,12 @@
         // "target": "es3",
         // "ignoreDeprecations": "5.0",
     },
+    "include": [
+        "src/**/*.ts",
+    ],
     "exclude": [
         "node_modules",
+        "out",
         "wwwroot"
     ]
 }
