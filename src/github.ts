@@ -19,6 +19,7 @@ export interface GitHubLink {
     number: number,
 }
 
+// https://docs.github.com/en/rest/using-the-rest-api/github-event-types
 export type RepoEventType =
     "IssueCommentEvent" |
     "IssuesEvent" |
