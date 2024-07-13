@@ -1,6 +1,9 @@
 // NOTE: package.json must include `"type": "module",` for type hints to work correctly!
 
+import { OctokitResponse } from "@octokit/types";
 import { Octokit } from "octokit";
+
+const delay = (millis: number) => new Promise(resolve => setTimeout(resolve, millis));
 
 export enum GitHubLinkType {
     Issue,
@@ -15,6 +18,14 @@ export interface GitHubLink {
     emoji: string,
     number: number,
 }
+
+export type RepoEventType =
+    "IssueCommentEvent" |
+    "IssuesEvent" |
+    "PullRequestEvent" |
+    "PullRequestReviewCommentEvent" |
+    "PullRequestReviewEvent" |
+    "WatchEvent";
 
 export class GitHub {
     api: Octokit;
@@ -76,6 +87,67 @@ export class GitHub {
                 return "✅";
             })(),
         };
+    }
+
+    // Monitors the target repo and asynchronously yields events of interest.
+    public async *watchForEvents(epoch: Date, eventsOfInterest: RepoEventType[]) {
+        const watchTypes = new Set<RepoEventType>();
+        for (const watch of eventsOfInterest) {
+            watchTypes.add(watch);
+        }
+
+        let etag: string | undefined = undefined;
+        let pollInterval: number = 0;
+        while (true) {
+            await delay(pollInterval * 1000);
+            const events = await (async () => {
+                try {
+                    let result = await this.api.rest.activity.listRepoEvents({
+                        repo: this.repo,
+                        owner: this.owner,
+                        headers: {
+                            "if-none-match": etag,
+                        },
+                    });
+                    etag = result.headers.etag;
+                    return result;
+                } catch (ex: any) {
+                    const error = <OctokitResponse<never>>ex;
+                    // Ignore errors and just retry later
+                    if (error.status !== 304) {
+                        console.warn("GitHub events error: ", error);
+                    }
+                    return null;
+                }
+            })();
+            if (!events) {
+                // This has already been logged.
+                continue;
+            }
+
+            if (events.headers["x-poll-interval"]) {
+                pollInterval = parseInt(events.headers["x-poll-interval"].toString());
+            } else {
+                pollInterval = 60;
+            }
+
+            let handled = 0;
+            for (const event of events.data) {
+                if (new Date(event.created_at!) < epoch) {
+                    // Presume event has already been handled/reported
+                    continue;
+                }
+                handled += 1;
+                if (!watchTypes.has(<RepoEventType>event.type)) {
+                    console.debug(`Ignoring ${event.type} event ${event.id}`);
+                    continue;
+                }
+
+                yield event;
+            }
+
+            console.debug(`Handled ${handled} new repo event(s)`);
+        }
     }
 }
 
