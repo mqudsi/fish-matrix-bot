@@ -45,14 +45,26 @@ export class GitHub {
             return undefined;
         }
 
-        const issue = await this.api.rest.issues.get({
-            owner: this.owner,
-            repo: this.repo,
-            issue_number: number,
-        });
+        const issue = await (async () => {
+            try {
+                return await this.api.rest.issues.get({
+                    owner: this.owner,
+                    repo: this.repo,
+                    issue_number: number,
+                });
+            } catch (ex: any) {
+                const error = <OctokitResponse<never>>ex;
 
-        if (issue.status != 200) {
-            console.warn(`Unable to retrieve GitHub issue #${number}: `, issue);
+                if (error.status == 404) {
+                    console.debug(`Invalid/non-existent GitHub issue #${number}`);
+                } else {
+                    console.warn(`Unable to retrieve GitHub issue #${number}: `, error);
+                }
+                return undefined;
+            }
+        })();
+        if (issue === undefined) {
+            // Already logged above
             return undefined;
         }
 
