@@ -144,7 +144,7 @@ export class GitHub {
                 pollInterval = 60;
             }
 
-            let handled = 0;
+            let newEvents = 0;
             type eventType = Awaited<ReturnType<typeof this.api.rest.activity.listRepoEvents>>["data"][0];
             const batch: eventType[] = [];
             for (const event of events.data) {
@@ -152,7 +152,7 @@ export class GitHub {
                     // Presume event has already been handled/reported
                     continue;
                 }
-                handled += 1;
+                newEvents += 1;
                 if (!watchTypes.has(<RepoEventType>event.type)) {
                     console.debug(`Ignoring ${event.type} event ${event.id}`);
                     continue;
@@ -161,7 +161,7 @@ export class GitHub {
                 batch.push(event);
             }
 
-            console.debug(`Yielding ${batch.length} of ${handled} new repo event(s)`);
+            console.debug(`Yielding ${batch.length} of ${newEvents} new repo event(s)`);
             if (batch.length > 0) {
                 yield batch;
             }

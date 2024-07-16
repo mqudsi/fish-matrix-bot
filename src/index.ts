@@ -38,6 +38,7 @@ async function main() {
 
     await client.start();
     console.log("Matrix client started");
+    bot.monitorGitHub();
 }
 
 interface MatrixMessage {
@@ -122,7 +123,7 @@ class MatrixBot {
             lines.push(line);
         }
 
-        const toSend = await this.makeList(messageType, lines);
+        const toSend = this.makeList(messageType, lines);
         const result = messageType === "html"
             ? await this.client.sendHtmlText(roomId, toSend)
             : await this.client.sendText(roomId, toSend);
@@ -130,7 +131,7 @@ class MatrixBot {
         console.debug("Matrix send result: ", result);
     }
 
-    async makeList(messageType: string, lines: string[]) {
+    makeList(messageType: string, lines: string[]) {
         if (messageType === "html") {
             let html: string;
             if (lines.length === 1) {
@@ -147,6 +148,54 @@ class MatrixBot {
                 text = `* ${lines.join("\n* ")}`;
             }
             return text;
+        }
+    }
+
+    async monitorGitHub() {
+        const roomId = await this.client.resolveRoom("#fish-shell:matrix.org");
+        const epoch = new Date();
+        for await (const batch of this.github.watchForEvents(epoch, ["IssuesEvent", "PullRequestEvent"])) {
+            const lines: string[] = [];
+
+            for (const event of batch) {
+                const actor = event.actor;
+                if (event.type === "IssuesEvent") {
+                    const issue = event.payload.issue!;
+                    if (event.payload.action !== "opened" && event.payload.action !== "closed") {
+                        console.debug(`Unhandled ${event.type} with action ${event.payload.action}: `, event);
+                        continue;
+                    }
+
+                    const line = messageType === "html"
+                        ? `@${actor.login} ${event.payload.action} issue #${issue.number}: `
+                        + `<a href="${issue.html_url}">${issue.title}</a>`
+                        : `@${actor.login} ${event.payload.action} issue #${issue.number}: ${issue.title}`;
+                    lines.push(line);
+                } else if (event.type === "PullRequestEvent") {
+                    const pr = event.payload.issue!;
+                    if (event.payload.action !== "opened" && event.payload.action !== "closed") {
+                        console.debug(`Unhandled ${event.type} with action ${event.payload.action}: `, event);
+                        continue;
+                    }
+
+                    const line = messageType === "html"
+                        ? `@${actor.login} ${event.payload.action} pull request #${pr.number}: `
+                        + `<a href="${pr.html_url}">${pr.title}</a>`
+                        : `@${actor.login} ${event.payload.action} pull request #${pr.number}: ${pr.title}`;
+                    lines.push(line);
+                }
+            }
+
+            if (lines.length === 0) {
+                continue;
+            }
+
+            const toSend = this.makeList(messageType, lines);
+            const result = messageType === "html"
+                ? await this.client.sendHtmlText(roomId, toSend)
+                : await this.client.sendText(roomId, toSend);
+
+            console.debug("Matrix send result: ", result);
         }
     }
 }
