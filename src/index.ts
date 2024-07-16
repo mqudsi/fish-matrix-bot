@@ -122,28 +122,32 @@ class MatrixBot {
             lines.push(line);
         }
 
-        const client = this.client;
-        let result = await (async function() {
-            if (messageType === "html") {
-                let html: string;
-                if (lines.length === 1) {
-                    html = lines[0];
-                } else {
-                    html = `<ul><li>${lines.join("</li><li>")}</li></ul>`;
-                }
-                return await client.sendHtmlText(roomId, html);
-            } else {
-                let text: string;
-                if (lines.length === 1) {
-                    text = lines[0];
-                } else {
-                    text = `* ${lines.join("\n* ")}`;
-                }
-                return await client.sendText(roomId, text);
-            }
-        })();
+        const toSend = await this.makeList(messageType, lines);
+        const result = messageType === "html"
+            ? await this.client.sendHtmlText(roomId, toSend)
+            : await this.client.sendText(roomId, toSend);
 
         console.debug("Matrix send result: ", result);
+    }
+
+    async makeList(messageType: string, lines: string[]) {
+        if (messageType === "html") {
+            let html: string;
+            if (lines.length === 1) {
+                html = lines[0];
+            } else {
+                html = `<ul><li>${lines.join("</li><li>")}</li></ul>`;
+            }
+            return html;
+        } else {
+            let text: string;
+            if (lines.length === 1) {
+                text = lines[0];
+            } else {
+                text = `* ${lines.join("\n* ")}`;
+            }
+            return text;
+        }
     }
 }
 
