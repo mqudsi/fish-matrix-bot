@@ -145,6 +145,8 @@ export class GitHub {
             }
 
             let handled = 0;
+            type eventType = Awaited<ReturnType<typeof this.api.rest.activity.listRepoEvents>>["data"][0];
+            const batch: eventType[] = [];
             for (const event of events.data) {
                 if (new Date(event.created_at!) < epoch) {
                     // Presume event has already been handled/reported
@@ -156,10 +158,13 @@ export class GitHub {
                     continue;
                 }
 
-                yield event;
+                batch.push(event);
             }
 
-            console.debug(`Handled ${handled} new repo event(s)`);
+            console.debug(`Yielding ${batch.length} of ${handled} new repo event(s)`);
+            if (batch.length > 0) {
+                yield batch;
+            }
         }
     }
 }
