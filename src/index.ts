@@ -46,6 +46,10 @@ interface MatrixMessage {
     body: string,
 }
 
+function escape(s: string) {
+    return s.replace(/[^0-9A-Za-z ]/g, c => "&#" + c.charCodeAt(0) + ";");
+}
+
 class MatrixBot {
     github: GitHub;
     client: MatrixClient;
@@ -105,6 +109,7 @@ class MatrixBot {
             return;
         }
 
+        const e = escape;
         const lines: string[] = [];
         for (const ghLink of githubLinks) {
             let line: string;
@@ -116,7 +121,7 @@ class MatrixBot {
                 }
             })();
             if (messageType === "html") {
-                line = `<a href="${ghLink.url}">${issueType} #${ghLink.number}: ${ghLink.emoji} ${ghLink.title}</a>`;
+                line = `<a href="${ghLink.url}">${issueType} #${ghLink.number}: ${ghLink.emoji} ${e(ghLink.title)}</a>`;
             } else {
                 line = `${issueType} ${ghLink.number}: ${ghLink.emoji} ${ghLink.title}: ${ghLink.url}`;
             }
@@ -158,29 +163,30 @@ class MatrixBot {
             const lines: string[] = [];
 
             for (const event of batch) {
+                const e = escape;
                 const actor = event.actor;
                 if (event.type === "IssuesEvent") {
                     const issue = event.payload.issue!;
-                    if (event.payload.action !== "opened" && event.payload.action !== "closed") {
+                    if (["opened", "closed", "reopened"].findIndex(x => x === event.payload.action) === -1) {
                         console.debug(`Unhandled ${event.type} with action ${event.payload.action}: `, event);
                         continue;
                     }
 
                     const line = messageType === "html"
-                        ? `@${actor.login} ${event.payload.action} issue #${issue.number}: `
-                        + `<a href="${issue.html_url}">${issue.title}</a>`
+                        ? `@${e(actor.login)} ${event.payload.action} issue #${issue.number}: `
+                        + `<a href="${issue.html_url}">${e(issue.title)}</a>`
                         : `@${actor.login} ${event.payload.action} issue #${issue.number}: ${issue.title}`;
                     lines.push(line);
                 } else if (event.type === "PullRequestEvent") {
                     const pr = event.payload.issue!;
-                    if (event.payload.action !== "opened" && event.payload.action !== "closed") {
+                    if (["opened", "closed", "reopened"].findIndex(x => x === event.payload.action) === -1) {
                         console.debug(`Unhandled ${event.type} with action ${event.payload.action}: `, event);
                         continue;
                     }
 
                     const line = messageType === "html"
-                        ? `@${actor.login} ${event.payload.action} pull request #${pr.number}: `
-                        + `<a href="${pr.html_url}">${pr.title}</a>`
+                        ? `@${e(actor.login)} ${event.payload.action} pull request #${pr.number}: `
+                        + `<a href="${pr.html_url}">${e(pr.title)}</a>`
                         : `@${actor.login} ${event.payload.action} pull request #${pr.number}: ${pr.title}`;
                     lines.push(line);
                 }
