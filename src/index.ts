@@ -8,7 +8,8 @@ const accessToken = process.env.ACCESS_TOKEN!;
 const githubAccessToken = process.env.GITHUB_ACCESS_TOKEN!;
 const githubRepo = "fish-shell";
 const githubRepoOwner = "fish-shell";
-const messageType: "html" | "text" = "html";
+type MessageType = "html" | "text";
+const messageType: MessageType = "html";
 
 async function generateAccessToken(username: string, password: string) {
     const auth = new MatrixAuth(homeServerUrl);
@@ -133,10 +134,11 @@ class MatrixBot {
             ? await this.client.sendHtmlText(roomId, toSend)
             : await this.client.sendText(roomId, toSend);
 
+        console.debug("Extracted GitHub links: ", lines);
         console.debug("Matrix send result: ", result);
     }
 
-    makeList(messageType: string, lines: string[]) {
+    makeList(messageType: MessageType, lines: string[]) {
         if (messageType === "html") {
             let html: string;
             if (lines.length === 1) {
@@ -201,6 +203,7 @@ class MatrixBot {
                 ? await this.client.sendHtmlText(roomId, toSend)
                 : await this.client.sendText(roomId, toSend);
 
+            console.debug("GitHub events message: ", lines);
             console.debug("Matrix send result: ", result);
         }
     }
