@@ -180,7 +180,7 @@ class MatrixBot {
                         : `@${actor.login} ${event.payload.action} issue #${issue.number}: ${issue.title}`;
                     lines.push(line);
                 } else if (event.type === "PullRequestEvent") {
-                    const pr = event.payload.issue!;
+                    const pr = (<typeof event.payload.issue>(<any>event.payload).pull_request)!;
                     if (["opened", "closed", "reopened"].findIndex(x => x === event.payload.action) === -1) {
                         console.debug(`Unhandled ${event.type} with action ${event.payload.action}: `, event);
                         continue;
