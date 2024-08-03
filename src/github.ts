@@ -151,7 +151,7 @@ export class GitHub {
             for (const event of events.data) {
                 let eventDate = new Date(event.created_at!);
                 latest = Math.max(latest, eventDate.getTime());
-                if (eventDate < epoch) {
+                if (eventDate <= epoch) {
                     // Presume event has already been handled/reported
                     continue;
                 }
