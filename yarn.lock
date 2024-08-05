@@ -2,13 +2,18 @@
 # yarn lockfile v1
 
 
-"@matrix-org/matrix-sdk-crypto-nodejs@0.1.0-beta.6":
-  version "0.1.0-beta.6"
-  resolved "https://registry.yarnpkg.com/@matrix-org/matrix-sdk-crypto-nodejs/-/matrix-sdk-crypto-nodejs-0.1.0-beta.6.tgz#0ecae51103ee3c107af0d6d0738f33eb7cc9857e"
-  integrity sha512-JXyrHuCVMydUGgSetWsfqbbvHj3aUMOX5TUghlMtLFromyEu7wIsNgYt7PjJ+k3WdF4GVABRy4P6GNjaEMy2uA==
+"@matrix-org/matrix-sdk-crypto-nodejs@0.1.0-beta.6", "@matrix-org/matrix-sdk-crypto-nodejs@https://github.com/selfisekai/matrix-rust-sdk-crypto-nodejs.git#buildable":
+  version "0.1.0-beta.12"
+  resolved "https://github.com/selfisekai/matrix-rust-sdk-crypto-nodejs.git#44dd8fb153c4b443a42065d8507d022b48abd1a1"
   dependencies:
+    "@napi-rs/cli" "^2.18.0"
     https-proxy-agent "^5.0.1"
     node-downloader-helper "^2.1.5"
+
+"@napi-rs/cli@^2.18.0":
+  version "2.18.4"
+  resolved "https://registry.yarnpkg.com/@napi-rs/cli/-/cli-2.18.4.tgz#12bebfb7995902fa7ab43cc0b155a7f5a2caa873"
+  integrity sha512-SgJeA4df9DE2iAEpr3M2H0OKl/yjtg1BnRI5/JyowS71tUWhrfSu2LT0V3vlHET+g1hBVlrO60PmEXwUEKp8Mg==
 
 "@octokit/app@^15.0.0":
   version "15.1.0"

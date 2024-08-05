@@ -8,5 +8,8 @@
     "@octokit/types": "^13.5.0",
     "matrix-bot-sdk": "^0.7.1",
     "octokit": "^4.0.2"
+  },
+  "resolutions": {
+    "@matrix-org/matrix-sdk-crypto-nodejs": "https://github.com/selfisekai/matrix-rust-sdk-crypto-nodejs.git#buildable"
   }
 }
