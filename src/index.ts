@@ -131,8 +131,8 @@ class MatrixBot {
 
         const toSend = this.makeList(messageType, lines);
         const result = messageType === "html"
-            ? await this.client.sendHtmlText(roomId, toSend)
-            : await this.client.sendText(roomId, toSend);
+            ? await this.client.sendHtmlNotice(roomId, toSend)
+            : await this.client.sendNotice(roomId, toSend);
 
         console.debug("Extracted GitHub links: ", lines);
         console.debug("Matrix send result: ", result);
@@ -200,8 +200,8 @@ class MatrixBot {
 
             const toSend = this.makeList(messageType, lines);
             const result = messageType === "html"
-                ? await this.client.sendHtmlText(roomId, toSend)
-                : await this.client.sendText(roomId, toSend);
+                ? await this.client.sendHtmlNotice(roomId, toSend)
+                : await this.client.sendNotice(roomId, toSend);
 
             console.debug("GitHub events message: ", lines);
             console.debug("Matrix send result: ", result);
