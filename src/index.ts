@@ -75,7 +75,7 @@ class MatrixBot {
     // Primary entry point to handle actions that take place when a new room
     // message is received. Subsequently calls individual action handlers.
     async messageHandler(roomId: string, event: any) {
-        if (!event["content"]) {
+        if (!event["content"] || !event["content"]["body"]) {
             return;
         }
 
@@ -83,6 +83,10 @@ class MatrixBot {
             sender: event["sender"],
             body: event["content"]["body"],
         };
+
+        // Strip the "fallback" (quoted portion of a previous reply) from the
+        // body, so we are not processing portions of messages more than once.
+        message.body = message.body.replace(/^(> .*\n)+/, "");
 
         // Make sure we don't recursively process our own replies!
         if (message.sender === await this.client.getUserId()) {
