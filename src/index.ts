@@ -47,8 +47,16 @@ interface MatrixMessage {
     body: string,
 }
 
-function escape(s: string) {
-    return s.replace(/[^0-9A-Za-z ]/g, c => "&#" + c.charCodeAt(0) + ";");
+function escape(s: string): string {
+    const escapeMap: { [key: string]: string } = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&apos;',
+    };
+
+    return s.replace(/[&<>"']/g, c => escapeMap[c] || c);
 }
 
 class MatrixBot {
