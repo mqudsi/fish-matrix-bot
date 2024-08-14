@@ -188,7 +188,8 @@ class MatrixBot {
 
                     const line = messageType === "html"
                         ? `@${e(actor.login)} ${event.payload.action} issue #${issue.number}: `
-                        + `<a href="${issue.html_url}">${e(issue.title)}</a>`
+                        // + `<a href="${issue.html_url}">${e(issue.title)}</a>`
+                        + `${e(issue.title)}`
                         : `@${actor.login} ${event.payload.action} issue #${issue.number}: ${issue.title}`;
                     lines.push(line);
                 } else if (event.type === "PullRequestEvent") {
@@ -200,7 +201,8 @@ class MatrixBot {
 
                     const line = messageType === "html"
                         ? `@${e(actor.login)} ${event.payload.action} pull request #${pr.number}: `
-                        + `<a href="${pr.html_url}">${e(pr.title)}</a>`
+                        // + `<a href="${pr.html_url}">${e(pr.title)}</a>`
+                        + `${e(pr.title)}`
                         : `@${actor.login} ${event.payload.action} pull request #${pr.number}: ${pr.title}`;
                     lines.push(line);
                 }
